@@ -17,7 +17,24 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         Otherwise, return None.
 
     """
-    pass
+    
+    Q = [(0, initial_position)]
+    
+
+    
+    while Q:
+        current_cost, current_node = heappop(Q)
+        if current_node == destination:
+            return Q
+        else:
+            for cost, node in adj(graph, current_node):
+                pathcost = cost + current_cost
+                if node not in Q or pathcost < node[0]:
+                    heappush(Q, (pathcost, current_node))
+
+                
+    return None
+            
 
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
@@ -51,9 +68,32 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
+    
+    adjlst = []
+    for i in range(cell[0]-1, cell[0]+1):
+        for j in range(cell[1]-1, cell[1]+1):
+            if (i,j) not in level['spaces']:
+                continue
+            curr_cell = (i,j)
+            half_dist = distance(cell, curr_cell) * .5
+            cost1 = level['spaces'][cell]
+            cost2 = level['spaces'][curr_cell]
+            final_cost = half_dist * (cost1 + cost2)
+            heappush(adjlst, (final_cost, curr_cell))
+    
+    
+    
+    return adjlst
+    
+    
     pass
 
-
+def distance (p1, p2):
+        firstsum = (p2[1] - p1[1]) ** 2
+        secsum = (p2[0] - p1[0]) ** 2
+        total = firstsum + secsum
+        return sqrt(total)
+    
 def test_route(filename, src_waypoint, dst_waypoint):
     """ Loads a level, searches for a path between the given waypoints, and displays the result.
 
