@@ -3,6 +3,7 @@ from math import inf, sqrt
 from heapq import heappop, heappush
 
 
+
 def dijkstras_shortest_path(initial_position, destination, graph, adj):
     """ Searches for a minimal cost path through a graph using Dijkstra's algorithm.
 
@@ -20,23 +21,33 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
     
     Q = [(0, initial_position)]
     
-
+    
     
     while Q:
         current_cost, current_node = heappop(Q)
+        #print (current_node)
+        #print (destination)
         if current_node == destination:
             return Q
         else:
-            for cost, node in adj(graph, current_node):
+            adjlst = adj(graph, current_node)
+            #print (adjlst)
+            for cost, node in adjlst:
+                #print (cost)
+                #print (node)
                 pathcost = cost + current_cost
-                if node not in Q or pathcost < node[0]:
-                    heappush(Q, (pathcost, current_node))
+                if processElem(Q, node) or pathcost < node[0]:
+                    heappush(Q, (pathcost, node))
 
                 
+    
     return None
             
-
-
+def processElem(Q, node):
+    for elem in Q:
+        if node == elem[1]:
+            return False
+    return True
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     """ Calculates the minimum cost to every reachable cell in a graph from the initial_position.
 
@@ -68,25 +79,28 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
-    
+
     adjlst = []
-    for i in range(cell[0]-1, cell[0]+1):
-        for j in range(cell[1]-1, cell[1]+1):
-            if (i,j) not in level['spaces']:
+    for i in range(cell[0]-1, cell[0]+2):
+        for j in range(cell[1]-1, cell[1]+2):
+            #print ("curr_node = " + str((i,j)))
+            if (i,j) not in level['spaces'] or (i,j) == cell:
+                #print ((i,j))
                 continue
             curr_cell = (i,j)
             half_dist = distance(cell, curr_cell) * .5
+    
+                
             cost1 = level['spaces'][cell]
             cost2 = level['spaces'][curr_cell]
             final_cost = half_dist * (cost1 + cost2)
             heappush(adjlst, (final_cost, curr_cell))
     
     
-    
+    #[(0.0, (3, 2)), (1.0, (3, 1)), (1.5, (2, 2)), (2.121320343559643, (2, 1))]
+    #print (adjlst)
     return adjlst
     
-    
-    pass
 
 def distance (p1, p2):
         firstsum = (p2[1] - p1[1]) ** 2
