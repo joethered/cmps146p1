@@ -95,11 +95,6 @@ def dijkstras_path_costs(initial_position, destination, graph, adj):
     
     return None
             
-def node_not_queued(Q, node):
-    for elem in Q:
-        if node == elem[1]:
-            return False
-    return True
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     """ Calculates the minimum cost to every reachable cell in a graph from the initial_position.
