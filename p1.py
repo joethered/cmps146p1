@@ -1,7 +1,7 @@
 from p1_support import load_level, show_level, save_level_costs
 from math import inf, sqrt
 from heapq import heappop, heappush
-from tkinter.constants import CURRENT
+
 
 
 
@@ -49,6 +49,51 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
   
     
     return None
+
+def dijkstras_path_costs(initial_position, destination, graph, adj):
+    """ Searches for a minimal cost path through a graph using Dijkstra's algorithm.
+
+    Args:
+        initial_position: The initial cell from which the path extends.
+        destination: The end location for the path.
+        graph: A loaded level, containing walls, spaces, and waypoints.
+        adj: An adjacency function returning cells adjacent to a given cell as well as their respective edge costs.
+
+    Returns:
+        If a path exits, return a list containing the cost of the paths to all cells from initial_position to destination.
+        Otherwise, return None.
+
+    """
+    
+    Q = [(0, initial_position)]
+    dist = {}
+    prev = {}
+    
+    dist[initial_position] = 0
+    prev[initial_position] = [initial_position]
+    
+    while Q:
+        current_cost, current_node = heappop(Q)
+        if current_node == destination:
+            return dist[current_node]
+        else:
+            adjlst = adj(graph, current_node)
+            for cost, node in adjlst:
+                pathcost = cost + current_cost
+                if node not in prev:
+                    prev[node] = []
+                    prev[node].extend(prev[current_node])
+                    prev[node].append(node)
+                    dist[node] = pathcost
+                    heappush(Q, (pathcost, node))
+                elif pathcost < dist[node]:
+                    prev[node].extend(prev[current_node])
+                    prev[node].append(node)
+                    dist[node] = pathcost
+                    
+  
+    
+    return None
             
 def node_not_queued(Q, node):
     for elem in Q:
@@ -67,8 +112,13 @@ def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     Returns:
         A dictionary, mapping destination cells to the cost of a path from the initial_position.
     """
-    pass
-
+    paths = {}
+    for dest in graph['spaces']:
+        if dest != initial_position:
+            paths[dest] = dijkstras_path_costs(initial_position, dest, graph, adj)
+            
+            
+    return paths
 
 def navigation_edges(level, cell):
     """ Provides a list of adjacent cells and their respective costs from the given cell.
@@ -166,10 +216,10 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
 
 
 if __name__ == '__main__':
-    filename, src_waypoint, dst_waypoint = 'example.txt', 'a','e'
+    filename, src_waypoint, dst_waypoint = 'my_maze.txt', 'a','c'
 
     # Use this function call to find the route between two waypoints.
     test_route(filename, src_waypoint, dst_waypoint)
 
     # Use this function to calculate the cost to all reachable cells from an origin point.
-    cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
+    cost_to_all_cells(filename, src_waypoint, 'my_maze_costs.csv')
