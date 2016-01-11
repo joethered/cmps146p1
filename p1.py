@@ -1,6 +1,7 @@
 from p1_support import load_level, show_level, save_level_costs
 from math import inf, sqrt
 from heapq import heappop, heappush
+from tkinter.constants import CURRENT
 
 
 
@@ -20,34 +21,41 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
     """
     
     Q = [(0, initial_position)]
+    dist = {}
+    prev = {}
     
-    
+    dist[initial_position] = 0
+    prev[initial_position] = [initial_position]
     
     while Q:
         current_cost, current_node = heappop(Q)
-        #print (current_node)
-        #print (destination)
         if current_node == destination:
-            return Q
+            return prev[current_node]
         else:
             adjlst = adj(graph, current_node)
-            #print (adjlst)
             for cost, node in adjlst:
-                #print (cost)
-                #print (node)
                 pathcost = cost + current_cost
-                if processElem(Q, node) or pathcost < node[0]:
+                if node not in prev:
+                    prev[node] = []
+                    prev[node].extend(prev[current_node])
+                    prev[node].append(node)
+                    dist[node] = pathcost
                     heappush(Q, (pathcost, node))
-
-                
+                elif pathcost < dist[node]:
+                    prev[node].extend(prev[current_node])
+                    prev[node].append(node)
+                    dist[node] = pathcost
+                    
+  
     
     return None
             
-def processElem(Q, node):
+def node_not_queued(Q, node):
     for elem in Q:
         if node == elem[1]:
             return False
     return True
+
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     """ Calculates the minimum cost to every reachable cell in a graph from the initial_position.
 
